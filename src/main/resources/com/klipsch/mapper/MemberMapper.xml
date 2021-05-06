@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.klipsch.mapper.MemberMapper">
+
+	<select id="checkIdDuplicate" resultType="int">
+		select count(*)
+		from member_tbl
+		where mb_id_pk = #{mb_id_pk}
+	</select>
+	
+	<insert id="join">
+		insert into member_tbl(mb_id_pk, mb_name, mb_passwd, mb_email, mb_zipcode, mb_addr, mb_addr_d, mb_phone, mb_nick, mb_accept_e)
+		values(#{mb_id_pk}, #{mb_name}, #{mb_passwd}, #{mb_email}, #{mb_zipcode}, #{mb_addr}, #{mb_addr_d}, #{mb_phone}, #{mb_nick}, #{mb_accept_e})
+	</insert>
+	
+	<select id="login_ok" resultType="com.klipsch.domain.MemberVO">
+		select * from member_tbl where mb_id_pk = #{mb_id_pk}
+	</select>
+	
+	<select id="member_info" resultType="com.klipsch.domain.MemberVO">
+		select * from member_tbl where mb_id_pk = #{mb_id_pk}
+	</select>
+		
+	
+	<update id="modifyPOST">
+		update member_tbl 
+			set mb_passwd = #{mb_passwd},
+				mb_email = #{mb_email}, 
+				mb_zipcode = #{mb_zipcode}, 
+				mb_addr = #{mb_addr}, 
+				mb_addr_d = #{mb_addr_d}, 
+				mb_phone = #{mb_phone}, 
+				mb_nick = #{mb_nick}, 
+				mb_accept_e = #{mb_accept_e}, 
+				mb_date_upd = sysdate
+		where mb_id_pk = #{mb_id_pk}
+	</update>
+	
+	<update id="update_pw">
+		update member_tbl 
+			set mb_passwd = #{mb_passwd}
+		where mb_id_pk = #{mb_id_pk}
+	</update>
+	
+	
+	<select id="find_id" resultType="String">
+		select mb_id_pk 
+		from member_tbl 
+		where mb_name = #{mb_name}
+	</select>
+	
+	<select id="find_pwd" resultType="com.klipsch.domain.MemberVO">
+		select * from member_tbl 
+		where mb_id_pk = #{mb_id_pk} and mb_name = #{mb_name}
+	</select>
+	
+	<delete id="deleteUser">
+		delete from member_tbl
+		where mb_id_pk = #{mb_id_pk}
+	</delete>
+	
+	<!-- VO클래스 필드와 테이블 컬럼명이 다른 경우 -->
+	<resultMap type="com.klipsch.domain.UserInfoVO" id="userinfo">
+		
+		<!-- mb_id_pk, mb_name, mb_passwd, mb_email, mb_zipcode, mb_addr, mb_addr_d, mb_phone, mb_nick, mb_accept_e, mb_point, mb_date_sub, mb_date_upd, mb_date_last -->
+		<id property="user_id_pk" column="mb_id_pk" />
+		<result property="user_id_pk" column="mb_id_pk" />
+		<result property="user_name" column="mb_name" />
+		<result property="user_passwd" column="mb_passwd" />
+		<result property="user_email" column="mb_email" />
+		<result property="user_zipcode" column="mb_zipcode" />
+		<result property="user_addr" column="mb_addr" />
+		<result property="user_addr_d" column="mb_addr_d" />
+		<result property="user_phone" column="mb_phone" />
+		<result property="user_nick" column="mb_nick" />
+		<result property="user_accept_e" column="mb_accept_e" />
+		<result property="user_point" column="mb_point" />
+		<result property="user_date_sub" column="mb_date_sub" />
+		<result property="user_date_upd" column="mb_date_upd" />
+		<result property="user_date_last" column="mb_date_last" />
+		
+	</resultMap>
+	
+	<select id="userinfo_list" resultMap="userinfo">
+		select mb_id_pk, mb_name, mb_passwd, mb_email, mb_zipcode, mb_addr, mb_addr_d, mb_phone, mb_nick, mb_accept_e, mb_point, mb_date_sub, mb_date_upd, mb_date_last
+		from member_tbl
+	</select>
+</mapper>

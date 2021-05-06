@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.klipsch.mapper.UserProductMapper">
+	
+	<select id="getCategoryList" resultType="com.klipsch.domain.CategoryVO">
+		select cg_code_pk, cg_code_pri, cg_name from category_tbl
+		where cg_code_pri is null
+	</select>
+	
+	<select id="getSubCategoryList" resultType="com.klipsch.domain.CategoryVO">
+		select cg_code_pk, cg_code_pri, cg_name from category_tbl
+		where cg_code_pri = #{cg_code_pk}
+	</select>
+	
+	<select id="getProductListBysubCate" resultType="com.klipsch.domain.ProductVO">
+		<![CDATA[
+		select pdt_num_pk, cg_code_pk, cg_code_pri, pdt_name, pdt_price, pdt_discount, pdt_company, pdt_detail, pdt_img, pdt_amount, pdt_buy, pdt_date_sub, pdt_date_upd
+		from (select /*+ index_desc(product_tbl pdt_num_pk) */ rownum rn, pdt_num_pk, cg_code_pk, cg_code_pri, pdt_name, pdt_price, pdt_discount, pdt_company, pdt_detail, pdt_img, pdt_amount, pdt_buy, pdt_date_sub, pdt_date_upd
+     	  	  from product_tbl where pdt_num_pk > 0 and rownum > 0 and cg_code_pk = #{cg_code_pk} and rownum <= #{cri.pageNum} * #{cri.amount})
+		where rn > (#{cri.pageNum} - 1) * #{cri.amount}
+		]]>
+	</select>
+
+	<select id="getTotalCountProductBySubCate" resultType="int">
+		select count(*) from product_tbl where pdt_num_pk > 0 and cg_code_pk = #{cg_code_pk}
+	</select>
+	
+	<select id="getProductByNum" resultType="com.klipsch.domain.ProductVO">
+		select * from product_tbl where pdt_num_pk = #{pdt_num_pk}
+	</select>
+	
+</mapper>

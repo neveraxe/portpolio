@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.klipsch.mapper.BoardMapper">
+
+	<select id="getListWithSearchPaging" resultType="com.klipsch.domain.BoardVO">
+		<![CDATA[
+			select brd_num_pk, mb_id_pk, brd_title, brd_content, brd_date_reg
+			from 
+			(
+				select /*+ index_desc(board_tbl brd_num_pk) */ rownum rn, brd_num_pk, mb_id_pk, brd_title, brd_content, brd_date_reg 
+		        from board_tbl
+		        where  
+	     ]]>
+	        
+	       <include refid="criteria"></include>
+	          
+	        
+	     <![CDATA[    
+	        rownum > 0 and rownum <= #{pageNum} * #{amount}
+	        )
+			where rn  > (#{pageNum} - 1) * #{amount}
+		 ]]>
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+		
+		select count(*) from board_tbl where  
+		
+		<include refid="criteria"></include>
+		<![CDATA[
+		brd_num_pk > 0
+		]]>
+	</select>
+	
+	<sql id="criteria">
+		<trim prefix="(" suffix=")  and" prefixOverrides="OR" > 
+	       <foreach item="type" collection="typeArr">
+	         <trim prefix="OR">	
+		       	<choose>
+		       		<when test="type == 'T'.toString()">
+		       			brd_title like '%' || #{keyword} || '%'
+		       		</when>
+		       		<when test="type == 'C'.toString()">
+		       			brd_content like '%' || #{keyword} || '%'
+		       		</when>
+		       		<when test="type == 'W'.toString()">
+		       			mb_id_pk like '%' || #{keyword} || '%'
+		       		</when>
+		       	</choose>
+	         </trim>
+	       </foreach> 
+	    </trim>
+	</sql>
+	
+	<insert id="insert">
+		insert into board_tbl(brd_num_pk, mb_id_pk, brd_title, brd_content, brd_date_reg)
+		values(seq_board_num.nextval, #{mb_id_pk}, #{brd_title}, #{brd_content}, sysdate)
+	</insert>
+	
+	
+	<select id="read" resultType="com.klipsch.domain.BoardVO">
+		<![CDATA[
+		SELECT brd_num_pk, mb_id_pk, brd_title, brd_content, brd_date_reg  from board_tbl where brd_num_pk = #{brd_num_pk}
+		]]>
+	</select>
+	
+	<update id="update">
+		update board_tbl set brd_title = #{brd_title}, brd_content = #{brd_content}, mb_id_pk = #{mb_id_pk}, brd_date_reg = sysdate
+		where brd_num_pk = #{brd_num_pk}
+	</update>
+	
+	<delete id="delete">
+		delete from board_tbl where brd_num_pk = #{brd_num_pk}
+	</delete>
+	
+</mapper>
